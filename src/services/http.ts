@@ -37,8 +37,12 @@ async function requestNewAccessToken(refreshToken: string): Promise<string> {
 
 function redirectToLogin(): void {
   clearTokens();
-  if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-    window.location.assign('/login');
+  if (typeof window === 'undefined') return;
+  // Respect the Vite base path ("/foodiego-frontend/" on GitHub Pages, "/" in dev)
+  // so this hard redirect keeps the subpath instead of 404-ing at the account root.
+  const loginPath = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/login`;
+  if (window.location.pathname !== loginPath) {
+    window.location.assign(loginPath);
   }
 }
 
