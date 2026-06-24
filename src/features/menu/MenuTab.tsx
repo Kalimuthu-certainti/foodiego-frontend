@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Lock, Pencil, Plus } from 'lucide-react';
+import { Lock, Pencil, Plus, Upload } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge, type BadgeVariant } from '../../components/ui/badge';
 import { Card, CardContent } from '../../components/ui/card';
 import { DataTable, type Column } from '../../components/DataTable';
 import { MenuFormDialog, type MenuDialogMode } from './MenuFormDialog';
+import { BulkImportDialog } from './BulkImportDialog';
 import * as menuApi from '../../services/menuApi';
 import { CHANGE_REQUEST_STATUS_LABELS, QUERY_KEYS } from '../../utils/constants';
 import { formatDateTime, truncate } from '../../utils/format';
@@ -20,6 +21,7 @@ const STATUS_VARIANTS: Record<ChangeRequestStatus, BadgeVariant> = {
 /** Brand-detail "Menu" tab: submit the initial menu, then file change requests. */
 export function MenuTab({ brand }: { brand: Brand }) {
   const [dialog, setDialog] = useState<MenuDialogMode | null>(null);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const locked = brand.menu_locked;
 
   const { data: requests = [], isLoading } = useQuery({
@@ -78,17 +80,23 @@ export function MenuTab({ brand }: { brand: Brand }) {
               </p>
             </div>
           </div>
-          {locked ? (
-            <Button onClick={() => setDialog('change')}>
-              <Pencil className="h-4 w-4" />
-              Request change
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" onClick={() => setBulkOpen(true)}>
+              <Upload className="h-4 w-4" />
+              Bulk import
             </Button>
-          ) : (
-            <Button onClick={() => setDialog('submit')}>
-              <Plus className="h-4 w-4" />
-              Submit menu
-            </Button>
-          )}
+            {locked ? (
+              <Button onClick={() => setDialog('change')}>
+                <Pencil className="h-4 w-4" />
+                Request change
+              </Button>
+            ) : (
+              <Button onClick={() => setDialog('submit')}>
+                <Plus className="h-4 w-4" />
+                Submit menu
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -112,6 +120,8 @@ export function MenuTab({ brand }: { brand: Brand }) {
           onOpenChange={(open) => !open && setDialog(null)}
         />
       ) : null}
+
+      <BulkImportDialog brandId={brand.id} open={bulkOpen} onOpenChange={setBulkOpen} />
     </div>
   );
 }
