@@ -12,7 +12,14 @@ import BrandDetailPage from '../pages/BrandDetailPage';
  *     index            -> BrandListPage
  *     brands/:id       -> BrandDetailPage
  */
-export const router = createBrowserRouter([
+
+// Vite's BASE_URL is "/" in dev and "/foodiego-frontend/" on GitHub Pages.
+// React Router needs it (without the trailing slash) so routes resolve under the
+// subpath instead of bouncing to the account root (which 404s).
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || undefined;
+
+export const router = createBrowserRouter(
+  [
   {
     path: '/login',
     element: <LoginPage />,
@@ -33,4 +40,6 @@ export const router = createBrowserRouter([
     path: '*',
     element: <Navigate to="/" replace />,
   },
-]);
+  ],
+  { basename },
+);
