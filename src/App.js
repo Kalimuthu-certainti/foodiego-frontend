@@ -5,7 +5,7 @@ import JobsListPage from './pages/JobsListPage';
 import MenuItemsPage from './pages/MenuItemsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 
-localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InJlc3RhdXJhbnRfb3duZXIiLCJpYXQiOjE3ODE2MDczNDV9.EZhJKOyYr-O3QFiLhRBaY3_DMh8WRCUs5q-IFM5id_c');
+localStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InJlc3RhdXJhbnRfb3duZXIiLCJpYXQiOjE3ODIyOTI1Njh9.l81EDLnEFxFuvL_TfhGl3ukIvgkwlNEjeSio0CtBso8');
 
 export default function App() {
   return (

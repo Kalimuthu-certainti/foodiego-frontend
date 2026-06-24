@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import AppLayout from '../components/AppLayout';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:6060/api';
 const SUPERSET_URL = 'http://localhost:8088';
 const EMBEDDED_UUID = '0371ec9d-8576-4039-a826-c21229ccb0de';
 

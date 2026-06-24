@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5000/api/bulk-upload';
+const API_BASE = 'http://localhost:6060/api/bulk-upload';
 
 const getAuthHeader = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`,
