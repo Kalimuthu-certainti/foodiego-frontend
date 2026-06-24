@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
-import { Plus, Trash2, Upload } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Dialog } from '../../components/ui/dialog';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -33,49 +33,6 @@ type MenuFormValues = z.infer<typeof menuFormSchema>;
 
 const EMPTY_ITEM = { name: '', price: 0, description: '' };
 
-type ParsedItem = { name: string; price: number; description: string };
-
-/**
- * Parse pasted menu items as either a JSON array (`[{name, price, description}]`)
- * or CSV (`name,price,description` per line, optional header). Throws a friendly
- * Error describing the first bad row.
- */
-function parseBulkItems(text: string): ParsedItem[] {
-  const trimmed = text.trim();
-  if (!trimmed) throw new Error('Paste some items first.');
-
-  // JSON array / object.
-  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
-    let data: unknown;
-    try {
-      data = JSON.parse(trimmed);
-    } catch {
-      throw new Error('That does not look like valid JSON.');
-    }
-    const rows = Array.isArray(data) ? data : [data];
-    return rows.map((row, i) => {
-      const r = row as Record<string, unknown>;
-      const name = String(r.name ?? '').trim();
-      const price = Number(r.price);
-      if (!name) throw new Error(`Item ${i + 1}: name is required.`);
-      if (!Number.isFinite(price)) throw new Error(`Item ${i + 1}: price must be a number.`);
-      return { name, price, description: r.description ? String(r.description) : '' };
-    });
-  }
-
-  // CSV: name,price,description (a header row with "name" + "price" is skipped).
-  const lines = trimmed.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-  const hasHeader = /name/i.test(lines[0]) && /price/i.test(lines[0]);
-  return lines.slice(hasHeader ? 1 : 0).map((line, i) => {
-    const cols = line.split(',').map((c) => c.trim());
-    const name = cols[0];
-    const price = Number(cols[1]);
-    if (!name) throw new Error(`Row ${i + 1}: name is required.`);
-    if (!Number.isFinite(price)) throw new Error(`Row ${i + 1}: price must be a number.`);
-    return { name, price, description: cols.slice(2).join(', ') };
-  });
-}
-
 export type MenuDialogMode = 'submit' | 'change';
 
 export interface MenuFormDialogProps {
@@ -86,9 +43,11 @@ export interface MenuFormDialogProps {
 }
 
 /**
- * Build the menu in either mode:
+ * Build the menu by hand in either mode:
  * - "submit": POST the brand's initial menu (locks the menu).
  * - "change": file a change request against a locked menu.
+ *
+ * For importing many items from a file, use Bulk import (see BulkImportDialog).
  */
 export function MenuFormDialog({ brandId, mode, open, onOpenChange }: MenuFormDialogProps) {
   const queryClient = useQueryClient();
@@ -99,48 +58,17 @@ export function MenuFormDialog({ brandId, mode, open, onOpenChange }: MenuFormDi
     handleSubmit,
     reset,
     control,
-    getValues,
     formState: { errors },
   } = useForm<MenuFormValues>({
     resolver: zodResolver(menuFormSchema),
     defaultValues: { items: [{ ...EMPTY_ITEM }], reason: '' },
   });
 
-  const { fields, append, remove, replace } = useFieldArray({ control, name: 'items' });
-
-  const [bulkOpen, setBulkOpen] = useState(false);
-  const [bulkText, setBulkText] = useState('');
-  const [bulkError, setBulkError] = useState('');
+  const { fields, append, remove } = useFieldArray({ control, name: 'items' });
 
   useEffect(() => {
-    if (open) {
-      reset({ items: [{ ...EMPTY_ITEM }], reason: '' });
-      setBulkOpen(false);
-      setBulkText('');
-      setBulkError('');
-    }
+    if (open) reset({ items: [{ ...EMPTY_ITEM }], reason: '' });
   }, [open, reset]);
-
-  /** Parse the pasted CSV/JSON and merge it into the current item list. */
-  const applyBulk = () => {
-    let parsed: ParsedItem[];
-    try {
-      parsed = parseBulkItems(bulkText);
-    } catch (err) {
-      setBulkError(err instanceof Error ? err.message : 'Could not parse those items.');
-      return;
-    }
-    if (parsed.length === 0) {
-      setBulkError('No items found.');
-      return;
-    }
-    // Keep any rows the user already filled in, drop empty placeholders.
-    const existing = (getValues('items') ?? []).filter((it) => it.name && it.name.trim());
-    replace([...existing, ...parsed]);
-    setBulkText('');
-    setBulkError('');
-    setBulkOpen(false);
-  };
 
   const mutation = useMutation<Brand | MenuChangeRequest, unknown, MenuFormValues>({
     mutationFn: (values: MenuFormValues) => {
@@ -253,60 +181,16 @@ export function MenuFormDialog({ brandId, mode, open, onOpenChange }: MenuFormDi
           <p className="text-xs font-medium text-red-600">{errors.items.message}</p>
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => append({ ...EMPTY_ITEM })}
-          >
-            <Plus className="h-4 w-4" />
-            Add item
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setBulkOpen((v) => !v)}
-          >
-            <Upload className="h-4 w-4" />
-            Import
-          </Button>
-        </div>
-
-        {bulkOpen ? (
-          <div className="flex flex-col gap-2 rounded-md border border-slate-200 bg-slate-50 p-3">
-            <p className="text-xs text-slate-600">
-              Paste a CSV (<span className="font-mono">name,price,description</span> per line) or a JSON
-              array of <span className="font-mono">{'{ name, price, description }'}</span>.
-            </p>
-            <Textarea
-              rows={5}
-              value={bulkText}
-              onChange={(e) => setBulkText(e.target.value)}
-              placeholder={'Paneer Tikka,280,Char-grilled cottage cheese\nButter Naan,60\nHyderabadi Biryani,320'}
-              className="font-mono text-xs"
-              aria-label="Bulk menu items"
-            />
-            {bulkError ? <p className="text-xs font-medium text-red-600">{bulkError}</p> : null}
-            <div className="flex items-center gap-2">
-              <Button type="button" size="sm" onClick={applyBulk}>
-                Add items
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setBulkOpen(false);
-                  setBulkError('');
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        ) : null}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="self-start"
+          onClick={() => append({ ...EMPTY_ITEM })}
+        >
+          <Plus className="h-4 w-4" />
+          Add item
+        </Button>
 
         {isChange ? (
           <FormField label="Reason" htmlFor="menu-reason" error={errors.reason?.message}>
