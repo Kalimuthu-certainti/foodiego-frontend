@@ -36,11 +36,11 @@ jobs:
 
       # Build for production. --base must match the repo name so asset URLs resolve
       # under https://<user>.github.io/foodiego-frontend/ (without it the page is blank).
-      # VITE_API_URL is injected from a repo Variable so the live build calls the real
-      # backend instead of localhost. (Set it in Settings → Variables → Actions.)
+      # VITE_API_URL is the backend's public URL (+ /api) so the live build calls Render
+      # instead of localhost. Stored as a repo Secret (Settings → Secrets → Actions).
       - run: npm run build -- --base=/foodiego-frontend/
         env:
-          VITE_API_URL: "${{ vars.VITE_API_URL }}"
+          VITE_API_URL: "${{ secrets.VITE_API_URL }}"
 
       # SPA fallback: the app uses BrowserRouter, so Pages must serve the app shell for
       # deep links (/login, /brands/:id) on refresh — copying index.html → 404.html does that.
