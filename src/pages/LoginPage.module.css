@@ -1,0 +1,275 @@
+/* ── Full-page food background ───────────────────────── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.45)),
+    url('https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ── Centering wrapper — constrains width, centers card ─ */
+.wrap {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* ── Card ─────────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.35);
+  padding: 36px 32px 32px;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Brand ────────────────────────────────────────────── */
+.brand {
+  font-size: 26px;
+  font-weight: 800;
+  color: #c05a1e;
+  text-align: center;
+  letter-spacing: -0.5px;
+  margin: 0 0 4px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.subtitle strong { color: #111827; }
+
+/* ── Back button ──────────────────────────────────────── */
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: #6b7280;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 10px;
+  font-family: inherit;
+}
+.backBtn:hover { color: #374151; }
+
+/* ── Form ─────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ── Input ────────────────────────────────────────────── */
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.prefix {
+  position: absolute;
+  left: 13px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #374151;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 52px;
+  color: #9ca3af;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px 0 42px;
+  background: #f9fafb;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.18s, background 0.18s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.inputWithPrefix { padding-left: 76px; }
+.input::placeholder { color: #9ca3af; }
+.input:focus { border-color: #e07820; background: #fff; }
+
+/* ── OTP section ──────────────────────────────────────── */
+.otpSection {
+  border: 1.5px solid #fed7aa;
+  background: #fff7ed;
+  border-radius: 12px;
+  padding: 14px 12px;
+  box-sizing: border-box;
+}
+
+.otpHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.otpLabel {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #c05a1e;
+}
+
+.otpTimer { font-size: 12px; color: #6b7280; }
+
+.resendBtn {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c7de0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.otpBoxes {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.otpBox {
+  width: 100%;
+  height: 48px;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  background: #fff;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  caret-color: #e07820;
+  transition: border-color 0.15s;
+  font-family: inherit;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.otpBox:focus { border-color: #e07820; background: #fffbf7; }
+
+/* ── Dev OTP banner ───────────────────────────────────── */
+.devBanner {
+  background: #fef3c7;
+  border: 1.5px dashed #f59e0b;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.devBannerText { font-size: 12px; color: #92400e; }
+
+.devOtp {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #b45309;
+  font-family: monospace;
+}
+
+/* ── Login button ─────────────────────────────────────── */
+.loginBtn {
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(135deg, #f07820 0%, #df6818 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.18s, transform 0.1s;
+  font-family: inherit;
+}
+
+.loginBtn:hover:not(:disabled) { opacity: 0.92; }
+.loginBtn:active:not(:disabled) { transform: scale(0.98); }
+.loginBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Error ────────────────────────────────────────────── */
+.error { font-size: 12.5px; color: #dc2626; margin: 0; }
+
+/* ── Footer ───────────────────────────────────────────── */
+.noAccount {
+  margin-top: 18px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+}
+
+.registerLink {
+  color: #fbbf24;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+}
+.registerLink:hover { text-decoration: underline; }
+
+/* ── Spinner ──────────────────────────────────────────── */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

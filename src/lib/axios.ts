@@ -7,12 +7,16 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const raw = localStorage.getItem('onroute-auth');
-  if (raw) {
+  // Check friend's auth store first (OTP flow), fall back to Zustand persist store
+  const accessToken = localStorage.getItem('accessToken');
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  } else {
     try {
-      const { state } = JSON.parse(raw);
-      if (state?.token) {
-        config.headers.Authorization = `Bearer ${state.token}`;
+      const raw = localStorage.getItem('onroute-auth');
+      if (raw) {
+        const { state } = JSON.parse(raw);
+        if (state?.token) config.headers.Authorization = `Bearer ${state.token}`;
       }
     } catch { /* noop */ }
   }

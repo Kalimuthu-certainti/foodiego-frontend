@@ -1,0 +1,391 @@
+/* ── Card ─────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+}
+
+/* ── Hero banner ─────────────────────────────────────── */
+.hero {
+  background: var(--brand);
+  padding: 32px 32px 24px;
+  text-align: center;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.logoIcon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.logoText {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.5px;
+}
+
+.tagline {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 400;
+}
+
+/* ── Tab switcher ─────────────────────────────────────── */
+.tabs {
+  display: flex;
+  background: var(--brand-dark);
+  padding: 0 32px;
+  gap: 4px;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tabActive {
+  color: var(--white);
+  border-bottom-color: var(--white);
+}
+
+/* ── Step header ──────────────────────────────────────── */
+.stepHeader {
+  padding: 24px 32px 0;
+}
+
+.stepTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stepSubtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* ── Step breadcrumb ─────────────────────────────────── */
+.stepNav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 32px 0;
+}
+
+.stepDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.stepDotActive {
+  background: var(--brand);
+  transform: scale(1.25);
+}
+
+.stepDotDone {
+  background: var(--brand);
+}
+
+/* ── Back button ──────────────────────────────────────── */
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 16px 32px 0;
+  margin: 0;
+}
+
+.backBtn:hover {
+  color: var(--brand);
+}
+
+/* ── Form ─────────────────────────────────────────────── */
+.form {
+  padding: 20px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hint {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.hint strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── Input group ──────────────────────────────────────── */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.required {
+  color: var(--brand);
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.phoneRow {
+  display: flex;
+  align-items: center;
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.phoneRow:focus-within {
+  border-color: var(--brand);
+  background: var(--white);
+}
+
+.phonePrefix {
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-right: 1.5px solid var(--border);
+  height: 48px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.input {
+  width: 100%;
+  padding: 0 14px;
+  height: 48px;
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.phoneRow .input {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.input:focus {
+  border-color: var(--brand);
+  background: var(--white);
+}
+
+.fieldHint {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── OTP boxes ────────────────────────────────────────── */
+.otpRow {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.otpInput {
+  flex: 1;
+  height: 52px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  outline: none;
+  caret-color: var(--brand);
+  transition: border-color 0.2s, background 0.2s;
+  font-family: inherit;
+}
+
+.otpInput:focus {
+  border-color: var(--brand);
+  background: var(--white);
+}
+
+.otpInputError {
+  border-color: var(--error) !important;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* ── Timer / resend ───────────────────────────────────── */
+.timerRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.timer {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.linkBtn:hover {
+  text-decoration: underline;
+}
+
+/* ── Error ────────────────────────────────────────────── */
+.error {
+  font-size: 12.5px;
+  color: var(--error);
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* ── Primary button ───────────────────────────────────── */
+.btn {
+  width: 100%;
+  height: 50px;
+  background: var(--brand);
+  color: var(--white);
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+  font-family: inherit;
+  margin-top: 4px;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--brand-dark);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Spinner ──────────────────────────────────────────── */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Success screen ───────────────────────────────────── */
+.successCard {
+  padding: 40px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.successIcon {
+  width: 64px;
+  height: 64px;
+  background: #E8F5E9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.successTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.successMsg {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.successUsername {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+}
