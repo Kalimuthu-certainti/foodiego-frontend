@@ -1,0 +1,54 @@
+# Deploy the FoodieGo frontend to GitHub Pages.
+#
+# Runs after code lands on `main` (i.e. after a PR merge): builds the Vite app and
+# publishes the static output to GitHub Pages. Enable it once in the repo via
+# Settings → Pages → Source = "GitHub Actions".
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+# Permissions the deploy-pages action needs to publish.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deploy at a time; newer pushes cancel an in-flight one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: "${{ steps.deployment.outputs.page_url }}"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+
+      # Build for production. --base must match the repo name so asset URLs resolve
+      # under https://<user>.github.io/foodiego-frontend/ (without it the page is blank).
+      # VITE_API_URL is injected from a repo Variable so the live build calls the real
+      # backend instead of localhost. (Set it in Settings → Variables → Actions.)
+      - run: npm run build -- --base=/foodiego-frontend/
+        env:
+          VITE_API_URL: "${{ vars.VITE_API_URL }}"
+
+      # SPA fallback: the app uses BrowserRouter, so Pages must serve the app shell for
+      # deep links (/login, /brands/:id) on refresh — copying index.html → 404.html does that.
+      - run: cp dist/index.html dist/404.html
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
