@@ -120,9 +120,9 @@ export default function BrandDetailPage() {
 
       {/* Tab content — navigation is in the sidebar */}
       {tab === 'branches' && <BranchesTab brandId={brand.id} />}
-      {tab === 'staff'       && <StaffTab brandId={brand.id} />}
-      {tab === 'menu'        && <MenuTab brand={brand} />}
-      {tab === 'reports'     && <ReportsTab brandId={brand.id} />}
+      {tab === 'staff'    && <StaffTab brandId={brand.id} />}
+      {tab === 'menu'     && <MenuTab brand={brand} />}
+      {tab === 'reports'  && <ReportsTab brandId={brand.id} />}
     </div>
   );
 }

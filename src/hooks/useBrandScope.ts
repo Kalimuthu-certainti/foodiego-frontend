@@ -10,6 +10,10 @@ export interface BrandScope {
   isLoading: boolean;
 }
 
+/**
+ * Returns the active brand ID from session context.
+ * Auto-selects when the owner has exactly one brand.
+ */
 export function useBrandScope(): BrandScope {
   const { brandId, selectBrand } = useSelectedBrand();
 

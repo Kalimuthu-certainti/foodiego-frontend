@@ -20,6 +20,7 @@ export default function BrandListPage() {
     queryFn: brandApi.list,
   });
 
+  // Single brand — auto-select and go straight to managing it.
   useEffect(() => {
     if (brands.length === 1) {
       selectBrand(brands[0].id);
@@ -38,6 +39,7 @@ export default function BrandListPage() {
     );
   }
 
+  // Multiple brands — show a list.
   const columns: Column<Brand>[] = [
     { key: 'name', header: 'Name', cell: (b) => <span className="font-medium text-slate-900">{b.name}</span> },
     { key: 'status', header: 'Status', cell: (b) => <BrandStatusBadge status={b.status} /> },
