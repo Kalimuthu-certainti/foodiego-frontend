@@ -1,12 +1,10 @@
-import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Lock, Store, Users, Wallet } from 'lucide-react';
+import { Lock, Store, Users, Wallet } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
 import { Spinner } from '../components/ui/spinner';
 import { EmptyState } from '../components/EmptyState';
 import { StatCard } from '../components/StatCard';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { useBrandScope } from '../hooks/useBrandScope';
 import { BrandStatusBadge } from '../features/brand/BrandStatusBadge';
 import { RestaurantsTab } from '../features/restaurant/RestaurantsTab';
@@ -21,30 +19,16 @@ import * as reportApi from '../services/reportApi';
 import { QUERY_KEYS } from '../utils/constants';
 import { formatCurrency, formatNumber } from '../utils/format';
 
-const TABS = [
-  { value: 'restaurants', label: 'Restaurants' },
-  { value: 'branches', label: 'Branches' },
-  { value: 'staff', label: 'Staff' },
-  { value: 'menu', label: 'Menu' },
-  { value: 'reports', label: 'Reports' },
-] as const;
-
-/** Single-brand workspace: header + tabbed management surfaces. */
 export default function BrandDetailPage() {
-  const { brandId } = useBrandScope();
-  const [tab, setTab] = useState<string>('restaurants');
+  const { brandId, isLoading: scopeLoading } = useBrandScope();
+  const { tab = 'restaurants' } = useParams<{ tab: string }>();
 
-  const {
-    data: brand,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: brand, isLoading, isError } = useQuery({
     queryKey: brandId ? QUERY_KEYS.brand(brandId) : ['brands', 'missing'],
     queryFn: () => brandApi.get(brandId as string),
     enabled: Boolean(brandId),
   });
 
-  // Overview metrics — these share query keys (and cache) with the tabs below.
   const { data: restaurants = [] } = useQuery({
     queryKey: QUERY_KEYS.restaurants(brandId ?? ''),
     queryFn: () => restaurantApi.listByBrand(brandId as string),
@@ -61,49 +45,47 @@ export default function BrandDetailPage() {
     enabled: Boolean(brandId),
   });
 
+  if (scopeLoading) return <div className="flex justify-center py-16"><Spinner /></div>;
   if (!brandId) return <Navigate to="/" replace />;
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Spinner />
-      </div>
-    );
-  }
-
+  if (isLoading) return <div className="flex justify-center py-16"><Spinner /></div>;
   if (isError || !brand) {
     return (
-      <div className="flex flex-col gap-4">
-        <BackLink />
-        <EmptyState
-          title="Brand not found"
-          description="This brand may have been removed, or you don't have access to it."
-        />
-      </div>
+      <EmptyState
+        title="Brand not found"
+        description="This brand may have been removed, or you don't have access to it."
+      />
     );
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <BackLink />
-
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold text-slate-900">{brand.name}</h1>
-          <BrandStatusBadge status={brand.status} />
-          {brand.menu_locked ? (
-            <Badge variant="muted" className="gap-1">
-              <Lock className="h-3 w-3" />
-              Menu locked
-            </Badge>
-          ) : null}
-          {!brand.is_active ? <Badge variant="danger">Inactive</Badge> : null}
+      {/* Brand header */}
+      <div className="flex items-start gap-4 border-b border-slate-100 pb-5">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-100 font-display text-xl font-bold text-brand-700">
+          {brand.name.slice(0, 1).toUpperCase()}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h1 className="text-xl font-semibold text-slate-900">{brand.name}</h1>
+            <BrandStatusBadge status={brand.status} />
+            {brand.menu_locked && (
+              <Badge variant="muted" className="gap-1">
+                <Lock className="h-3 w-3" /> Menu locked
+              </Badge>
+            )}
+            {!brand.is_active && <Badge variant="danger">Inactive</Badge>}
+          </div>
+          {brand.status === 'rejected' && brand.reject_reason ? (
+            <p className="mt-1 text-sm text-red-600">Rejected: {brand.reject_reason}</p>
+          ) : (
+            <p className="mt-0.5 text-sm text-slate-500">
+              Manage restaurants, staff, and menu
+            </p>
+          )}
         </div>
-        {brand.status === 'rejected' && brand.reject_reason ? (
-          <p className="text-sm text-red-600">Rejected: {brand.reject_reason}</p>
-        ) : null}
       </div>
 
+      {/* Stat cards */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         <StatCard
           label="Restaurants"
@@ -128,43 +110,12 @@ export default function BrandDetailPage() {
         />
       </div>
 
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
-          {TABS.map((t) => (
-            <TabsTrigger key={t.value} value={t.value}>
-              {t.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        <TabsContent value="restaurants">
-          <RestaurantsTab brandId={brand.id} />
-        </TabsContent>
-        <TabsContent value="branches">
-          <BranchesTab brandId={brand.id} />
-        </TabsContent>
-        <TabsContent value="staff">
-          <StaffTab brandId={brand.id} />
-        </TabsContent>
-        <TabsContent value="menu">
-          <MenuTab brand={brand} />
-        </TabsContent>
-        <TabsContent value="reports">
-          <ReportsTab brandId={brand.id} />
-        </TabsContent>
-      </Tabs>
+      {/* Tab content — navigation is in the sidebar */}
+      {tab === 'restaurants' && <RestaurantsTab brandId={brand.id} />}
+      {tab === 'branches'    && <BranchesTab brandId={brand.id} />}
+      {tab === 'staff'       && <StaffTab brandId={brand.id} />}
+      {tab === 'menu'        && <MenuTab brand={brand} />}
+      {tab === 'reports'     && <ReportsTab brandId={brand.id} />}
     </div>
-  );
-}
-
-function BackLink() {
-  return (
-    <Link
-      to="/"
-      className="inline-flex w-fit items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-900"
-    >
-      <ArrowLeft className="h-4 w-4" />
-      All brands
-    </Link>
   );
 }

@@ -41,30 +41,42 @@ export function Dialog({
       aria-modal="true"
     >
       <div
-        className="absolute inset-0 bg-slate-900/50"
+        className="absolute inset-0 bg-black/40"
         onClick={() => onOpenChange(false)}
         aria-hidden="true"
       />
       <div
         className={cn(
-          'relative z-10 w-full max-w-lg rounded-lg bg-white p-6 shadow-xl',
+          'animate-dialog-in relative z-10 w-full max-w-lg rounded-xl bg-white shadow-pop',
           className,
         )}
       >
+        {(title || description) && (
+          <div className="border-b border-slate-100 px-6 pb-4 pt-5">
+            <div className="pr-8">
+              {title ? (
+                <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+              ) : null}
+              {description ? (
+                <p className="mt-0.5 text-sm text-slate-500">{description}</p>
+              ) : null}
+            </div>
+          </div>
+        )}
         <button
           type="button"
           onClick={() => onOpenChange(false)}
           aria-label="Close"
-          className="absolute right-4 top-4 rounded-sm text-slate-400 transition-colors hover:text-slate-600"
+          className="absolute right-3 top-3 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
         >
           <X className="h-4 w-4" />
         </button>
-        {title ? (
-          <h2 className="pr-6 text-lg font-semibold text-slate-900">{title}</h2>
+        <div className="px-6 py-5">{children}</div>
+        {footer ? (
+          <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">
+            {footer}
+          </div>
         ) : null}
-        {description ? <p className="mt-1 text-sm text-slate-500">{description}</p> : null}
-        <div className={cn(title || description ? 'mt-4' : '')}>{children}</div>
-        {footer ? <div className="mt-6 flex justify-end gap-2">{footer}</div> : null}
       </div>
     </div>
   );

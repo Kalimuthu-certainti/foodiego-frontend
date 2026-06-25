@@ -121,7 +121,14 @@ export function ReportsTab({ brandId }: { brandId: string }) {
   ];
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900">Reports</h2>
+          <p className="mt-0.5 text-sm text-slate-500">Revenue, orders, and payout history</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           label="Orders"
@@ -152,21 +159,24 @@ export function ReportsTab({ brandId }: { brandId: string }) {
         />
       </div>
 
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-end gap-3">
-          <FormField label="From" htmlFor="report-from" className="w-40">
-            <Input id="report-from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
-          </FormField>
-          <FormField label="To" htmlFor="report-to" className="w-40">
-            <Input id="report-to" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-          </FormField>
-          {rows.length > 0 ? (
-            <p className="ml-auto text-sm text-slate-500">
-              <span className="font-medium text-slate-900">{formatNumber(totals.orders)}</span> orders ·{' '}
-              <span className="font-medium text-slate-900">{formatCurrency(totals.revenue)}</span> revenue
-            </p>
-          ) : null}
+      <section className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <p className="text-sm font-semibold text-slate-700">Daily breakdown</p>
+          <div className="flex flex-wrap items-end gap-3">
+            <FormField label="From" htmlFor="report-from" className="w-36">
+              <Input id="report-from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+            </FormField>
+            <FormField label="To" htmlFor="report-to" className="w-36">
+              <Input id="report-to" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+            </FormField>
+          </div>
         </div>
+        {rows.length > 0 ? (
+          <p className="text-sm text-slate-500">
+            <span className="font-medium text-slate-900">{formatNumber(totals.orders)}</span> orders ·{' '}
+            <span className="font-medium text-slate-900">{formatCurrency(totals.revenue)}</span> revenue in range
+          </p>
+        ) : null}
         <DataTable
           columns={reportColumns}
           data={rows}
@@ -177,9 +187,9 @@ export function ReportsTab({ brandId }: { brandId: string }) {
         />
       </section>
 
-      <section className="flex flex-col gap-4">
+      <section className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold text-slate-700">Payouts</h3>
+          <p className="text-sm font-semibold text-slate-700">Payouts</p>
           <div className="flex items-center gap-2">
             <Select
               aria-label="Filter payouts by status"

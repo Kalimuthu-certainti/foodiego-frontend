@@ -7,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table';
-import { Spinner } from './ui/spinner';
 import { EmptyState } from './EmptyState';
 import { cn } from '../utils/cn';
 
@@ -43,9 +42,36 @@ export function DataTable<T>({
   onRowClick,
 }: DataTableProps<T>) {
   if (isLoading) {
+    const PULSE_WIDTHS = ['w-1/3', 'w-1/2', 'w-2/5', 'w-1/4', 'w-3/5'];
     return (
-      <div className="flex items-center justify-center rounded-lg border border-slate-200 bg-white py-12">
-        <Spinner />
+      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {columns.map((col) => (
+                <TableHead key={col.key} className={col.headClassName}>
+                  {col.header}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: 5 }, (_, i) => (
+              <TableRow key={i} className="pointer-events-none">
+                {columns.map((col, j) => (
+                  <TableCell key={col.key}>
+                    <div
+                      className={cn(
+                        'h-3.5 animate-pulse rounded-md bg-slate-100',
+                        PULSE_WIDTHS[(i + j) % PULSE_WIDTHS.length],
+                      )}
+                    />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     );
   }
