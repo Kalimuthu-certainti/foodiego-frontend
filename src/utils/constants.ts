@@ -106,4 +106,5 @@ export const QUERY_KEYS = {
   reports: (brandId: string, from?: string, to?: string) =>
     ['reports', brandId, from ?? null, to ?? null] as const,
   payouts: (brandId: string) => ['payouts', brandId] as const,
+  bulkMenuItems: (restaurantId?: string) => ['bulk-menu-items', restaurantId ?? 'all'] as const,
 };

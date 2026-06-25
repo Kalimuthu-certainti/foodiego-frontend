@@ -50,3 +50,30 @@ export async function upload(params: {
   );
   return data.data;
 }
+
+/** An imported menu item row (price comes from Postgres NUMERIC as a string). */
+export interface BulkMenuItem {
+  id: number;
+  item_name: string;
+  category: string;
+  sub_category: string | null;
+  price: string;
+  food_type: string;
+  status: string;
+  restaurant_id: string | null;
+}
+
+export interface MenuItemsResponse {
+  items: BulkMenuItem[];
+  totalItems: number;
+  totalCategories: number;
+  filteredCount: number;
+}
+
+/** GET /bulk-upload/menu-items — items imported via bulk upload (optionally by restaurant). */
+export async function listMenuItems(restaurantId?: string): Promise<MenuItemsResponse> {
+  const { data } = await http.get<ApiEnvelope<MenuItemsResponse>>('/bulk-upload/menu-items', {
+    params: restaurantId ? { restaurant_id: restaurantId } : {},
+  });
+  return data.data;
+}
