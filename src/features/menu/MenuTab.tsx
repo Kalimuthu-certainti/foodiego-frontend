@@ -7,6 +7,7 @@ import { Card, CardContent } from '../../components/ui/card';
 import { DataTable, type Column } from '../../components/DataTable';
 import { MenuFormDialog, type MenuDialogMode } from './MenuFormDialog';
 import { BulkImportDialog } from './BulkImportDialog';
+import { ImportedMenuItems } from './ImportedMenuItems';
 import * as menuApi from '../../services/menuApi';
 import { CHANGE_REQUEST_STATUS_LABELS, QUERY_KEYS } from '../../utils/constants';
 import { formatDateTime, truncate } from '../../utils/format';
@@ -111,6 +112,8 @@ export function MenuTab({ brand }: { brand: Brand }) {
           emptyDescription="Proposed menu changes will appear here with their review status."
         />
       </div>
+
+      <ImportedMenuItems brandId={brand.id} />
 
       {dialog ? (
         <MenuFormDialog

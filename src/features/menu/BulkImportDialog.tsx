@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, FileUp, Upload } from 'lucide-react';
 import { Dialog } from '../../components/ui/dialog';
 import { Button } from '../../components/ui/button';
@@ -23,6 +23,7 @@ export interface BulkImportDialogProps {
 /** Bulk-import menu items from a CSV/Excel file into the bulk-upload module. */
 export function BulkImportDialog({ brandId, open, onOpenChange }: BulkImportDialogProps) {
   const toast = useToast();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [restaurantId, setRestaurantId] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -53,6 +54,8 @@ export function BulkImportDialog({ brandId, open, onOpenChange }: BulkImportDial
     },
     onSuccess: (res) => {
       setResult(res);
+      // Refresh the "Imported menu items" list (all + the chosen restaurant).
+      queryClient.invalidateQueries({ queryKey: ['bulk-menu-items'] });
       toast.success(`Imported ${res.importedRows} item(s).`);
     },
     onError: (err) => toast.error(getErrorMessage(err, 'Upload failed.')),
