@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Lock, Store, Users, Wallet } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
@@ -31,8 +30,13 @@ const TABS = [
 
 /** Single-brand workspace: header + tabbed management surfaces. */
 export default function BrandDetailPage() {
-  const { brandId } = useBrandScope();
-  const [tab, setTab] = useState<string>('restaurants');
+  const { brandId, isLoading: scopeLoading } = useBrandScope();
+  const { tab = 'restaurants' } = useParams<{ tab: string }>();
+  const navigate = useNavigate();
+
+  const handleTabChange = (newTab: string) => {
+    navigate(`/${newTab}`, { replace: true });
+  };
 
   const {
     data: brand,
@@ -61,6 +65,7 @@ export default function BrandDetailPage() {
     enabled: Boolean(brandId),
   });
 
+  if (scopeLoading) return <div className="flex justify-center py-16"><Spinner /></div>;
   if (!brandId) return <Navigate to="/" replace />;
 
   if (isLoading) {
@@ -128,7 +133,7 @@ export default function BrandDetailPage() {
         />
       </div>
 
-      <Tabs value={tab} onValueChange={setTab}>
+      <Tabs value={tab} onValueChange={handleTabChange}>
         <TabsList>
           {TABS.map((t) => (
             <TabsTrigger key={t.value} value={t.value}>
