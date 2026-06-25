@@ -44,6 +44,9 @@ export async function upload(params: {
   const { data } = await http.post<ApiEnvelope<BulkUploadResult>>(
     '/bulk-upload/upload',
     form,
+    // Clear the instance's default 'application/json' so the browser sets
+    // multipart/form-data + boundary — otherwise multer can't read the file.
+    { headers: { 'Content-Type': null } },
   );
   return data.data;
 }
