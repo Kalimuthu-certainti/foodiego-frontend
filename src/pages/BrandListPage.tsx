@@ -23,7 +23,7 @@ export default function BrandListPage() {
   useEffect(() => {
     if (brands.length === 1) {
       selectBrand(brands[0].id);
-      navigate('/restaurants', { replace: true });
+      navigate('/branches', { replace: true });
     }
   }, [brands, selectBrand, navigate]);
 
@@ -54,7 +54,7 @@ export default function BrandListPage() {
         columns={columns}
         data={brands}
         rowKey={(b) => b.id}
-        onRowClick={(b) => { selectBrand(b.id); navigate('/restaurants'); }}
+        onRowClick={(b) => { selectBrand(b.id); navigate('/branches'); }}
       />
     </div>
   );

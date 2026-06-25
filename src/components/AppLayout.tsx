@@ -4,7 +4,6 @@ import {
   LogOut,
   MapPin,
   UtensilsCrossed,
-  Store,
   Users,
   ChefHat,
   Menu,
@@ -18,11 +17,10 @@ import { QUERY_KEYS, APP_NAME } from '../utils/constants';
 import { cn } from '../utils/cn';
 
 const NAV = [
-  { to: '/restaurants', label: 'Restaurants', icon: Store },
-  { to: '/branches',    label: 'Branches',    icon: MapPin },
-  { to: '/staff',       label: 'Staff',        icon: Users },
-  { to: '/menu',        label: 'Menu',         icon: ChefHat },
-  { to: '/reports',     label: 'Reports',      icon: BarChart3 },
+  { to: '/branches', label: 'Branches', icon: MapPin },
+  { to: '/staff',    label: 'Staff',    icon: Users },
+  { to: '/menu',     label: 'Menu',     icon: ChefHat },
+  { to: '/reports',  label: 'Reports',  icon: BarChart3 },
 ];
 
 export function AppLayout() {

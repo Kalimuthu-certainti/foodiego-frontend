@@ -3,8 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { Select } from '../../components/ui/select';
-import { FormField } from '../../components/FormField';
 import { EmptyState } from '../../components/EmptyState';
 import { DataTable, type Column } from '../../components/DataTable';
 import { BranchFormDialog } from './BranchFormDialog';
@@ -14,7 +12,6 @@ import { QUERY_KEYS } from '../../utils/constants';
 import { formatCoords, formatWorkingHours } from '../../utils/format';
 import type { Branch } from '../../types';
 
-/** Brand-detail "Branches" tab: pick a restaurant, then list/add its branches. */
 export function BranchesTab({ brandId }: { brandId: string }) {
   const [restaurantId, setRestaurantId] = useState('');
   const [formOpen, setFormOpen] = useState(false);
@@ -24,7 +21,7 @@ export function BranchesTab({ brandId }: { brandId: string }) {
     queryFn: () => restaurantApi.listByBrand(brandId),
   });
 
-  // Default the selection to the first restaurant once they load.
+  // Auto-select the first (and typically only) restaurant silently — no picker shown.
   useEffect(() => {
     if (!restaurantId && restaurants.length > 0) setRestaurantId(restaurants[0].id);
   }, [restaurants, restaurantId]);
@@ -55,8 +52,8 @@ export function BranchesTab({ brandId }: { brandId: string }) {
   if (restaurants.length === 0) {
     return (
       <EmptyState
-        title="No restaurants yet"
-        description="Add a restaurant in the Restaurants tab before configuring branches."
+        title="No outlet configured yet"
+        description="Your restaurant outlet will be set up by an administrator."
       />
     );
   }
@@ -102,16 +99,6 @@ export function BranchesTab({ brandId }: { brandId: string }) {
           Add branch
         </Button>
       </div>
-      <div className="flex flex-wrap items-end gap-3">
-        <FormField label="Restaurant" htmlFor="branch-restaurant" className="w-full max-w-xs">
-          <Select
-            id="branch-restaurant"
-            value={restaurantId}
-            onChange={(e) => setRestaurantId(e.target.value)}
-            options={restaurants.map((r) => ({ value: r.id, label: r.name }))}
-          />
-        </FormField>
-      </div>
 
       <DataTable
         columns={columns}
@@ -128,13 +115,13 @@ export function BranchesTab({ brandId }: { brandId: string }) {
         }
       />
 
-      {restaurantId ? (
+      {restaurantId && (
         <BranchFormDialog
           restaurantId={restaurantId}
           open={formOpen}
           onOpenChange={setFormOpen}
         />
-      ) : null}
+      )}
     </div>
   );
 }

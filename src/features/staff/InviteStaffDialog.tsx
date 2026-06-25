@@ -18,29 +18,16 @@ import { QUERY_KEYS, ROLE_LABELS, STAFF_ROLES } from '../../utils/constants';
 import { getErrorMessage } from '../../utils/apiError';
 import type { InviteStaffInput } from '../../types';
 
-/**
- * Local form schema. Optional scope ids accept "" (empty, = brand-wide) from the
- * dropdowns and are stripped before the request; the backend re-validates.
- */
-const optionalUuid = (msg: string) => z.string().trim().uuid(msg).or(z.literal('')).optional();
-
 const inviteFormSchema = z.object({
-  name: z.string().trim().min(1, "Enter the staff member's name").max(120, 'Name is too long'),
-  role: staffRoleSchema,
-  phone: z.string().trim().regex(/^\d{10}$/, 'Phone must be exactly 10 digits'),
-  restaurantId: optionalUuid('Select a valid restaurant'),
-  branchId: optionalUuid('Select a valid branch'),
+  name:     z.string().trim().min(1, "Enter the staff member's name").max(120, 'Name is too long'),
+  role:     staffRoleSchema,
+  phone:    z.string().trim().regex(/^\d{10}$/, 'Phone must be exactly 10 digits'),
+  branchId: z.string().trim().uuid('Select a valid branch').or(z.literal('')).optional(),
 });
 
 type InviteFormValues = z.infer<typeof inviteFormSchema>;
 
-const EMPTY: InviteFormValues = {
-  name: '',
-  role: 'RESTAURANT_MANAGER',
-  phone: '',
-  restaurantId: '',
-  branchId: '',
-};
+const EMPTY: InviteFormValues = { name: '', role: 'RESTAURANT_MANAGER', phone: '', branchId: '' };
 
 export interface InviteStaffDialogProps {
   brandId: string;
@@ -48,19 +35,11 @@ export interface InviteStaffDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-/** Invite a user to a staff role scoped to this brand (optionally a restaurant/branch). */
 export function InviteStaffDialog({ brandId, open, onOpenChange }: InviteStaffDialogProps) {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm<InviteFormValues>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<InviteFormValues>({
     resolver: zodResolver(inviteFormSchema),
     defaultValues: EMPTY,
   });
@@ -69,34 +48,29 @@ export function InviteStaffDialog({ brandId, open, onOpenChange }: InviteStaffDi
     if (open) reset(EMPTY);
   }, [open, reset]);
 
-  const restaurantId = watch('restaurantId');
-
-  // A branch belongs to a restaurant — clear the chosen branch whenever the
-  // restaurant changes so a stale branch can't be submitted.
-  useEffect(() => {
-    setValue('branchId', '');
-  }, [restaurantId, setValue]);
-
+  // Silently resolve the brand's restaurant — not shown to the user.
   const { data: restaurants = [] } = useQuery({
     queryKey: QUERY_KEYS.restaurants(brandId),
     queryFn: () => restaurantApi.listByBrand(brandId),
     enabled: open,
   });
+  const firstRestaurantId = restaurants[0]?.id;
 
-  const { data: branches = [] } = useQuery({
-    queryKey: QUERY_KEYS.branches(restaurantId ?? ''),
-    queryFn: () => branchApi.listByRestaurant(restaurantId as string),
-    enabled: open && Boolean(restaurantId),
+  const { data: branches = [], isLoading: loadingBranches } = useQuery({
+    queryKey: QUERY_KEYS.branches(firstRestaurantId ?? ''),
+    queryFn: () => branchApi.listByRestaurant(firstRestaurantId as string),
+    enabled: open && Boolean(firstRestaurantId),
   });
 
   const mutation = useMutation({
     mutationFn: (values: InviteFormValues) => {
       const payload: InviteStaffInput = {
         brandId,
-        name: values.name,
-        role: values.role,
+        name:  values.name,
+        role:  values.role,
         phone: values.phone,
-        ...(values.restaurantId ? { restaurantId: values.restaurantId } : {}),
+        // Pass the resolved restaurantId when scoping to a branch
+        ...(values.branchId && firstRestaurantId ? { restaurantId: firstRestaurantId } : {}),
         ...(values.branchId ? { branchId: values.branchId } : {}),
       };
       return staffApi.invite(payload);
@@ -109,12 +83,14 @@ export function InviteStaffDialog({ brandId, open, onOpenChange }: InviteStaffDi
     onError: (err) => toast.error(getErrorMessage(err)),
   });
 
+  const noBranches = !loadingBranches && branches.length === 0;
+
   return (
     <Dialog
       open={open}
       onOpenChange={onOpenChange}
       title="Invite staff"
-      description="Grant a user a staff role on this brand. Scope to a restaurant or branch if needed."
+      description="Grant a user a staff role on this brand. Optionally scope to a specific branch."
       footer={
         <>
           <Button variant="outline" disabled={mutation.isPending} onClick={() => onOpenChange(false)}>
@@ -142,7 +118,8 @@ export function InviteStaffDialog({ brandId, open, onOpenChange }: InviteStaffDi
             {...register('name')}
           />
         </FormField>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+        <div className="grid grid-cols-2 gap-4">
           <FormField label="Role" htmlFor="s-role" required error={errors.role?.message}>
             <Select
               id="s-role"
@@ -151,53 +128,33 @@ export function InviteStaffDialog({ brandId, open, onOpenChange }: InviteStaffDi
               {...register('role')}
             />
           </FormField>
-          <FormField
-            label="Phone"
-            htmlFor="s-phone"
-            required
-            error={errors.phone?.message}
-            hint="10 digits"
-          >
+          <FormField label="Phone" htmlFor="s-phone" required error={errors.phone?.message} hint="10 digits">
             <Input id="s-phone" inputMode="numeric" invalid={Boolean(errors.phone)} {...register('phone')} />
           </FormField>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField
-            label="Restaurant"
-            htmlFor="s-restaurant"
-            error={errors.restaurantId?.message}
-            hint="Optional — leave as brand-wide to scope to the whole brand"
+
+        <FormField
+          label="Branch"
+          htmlFor="s-branch"
+          error={errors.branchId?.message}
+          hint="Optional — leave blank to grant brand-wide access"
+        >
+          <Select
+            id="s-branch"
+            disabled={noBranches || loadingBranches}
+            invalid={Boolean(errors.branchId)}
+            {...register('branchId')}
           >
-            <Select id="s-restaurant" invalid={Boolean(errors.restaurantId)} {...register('restaurantId')}>
-              <option value="">Brand-wide (all restaurants)</option>
-              {restaurants.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </Select>
-          </FormField>
-          <FormField
-            label="Branch"
-            htmlFor="s-branch"
-            error={errors.branchId?.message}
-            hint={restaurantId ? 'Optional' : 'Pick a restaurant first'}
-          >
-            <Select
-              id="s-branch"
-              disabled={!restaurantId}
-              invalid={Boolean(errors.branchId)}
-              {...register('branchId')}
-            >
-              <option value="">{restaurantId ? 'All branches' : '—'}</option>
-              {branches.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </Select>
-          </FormField>
-        </div>
+            <option value="">
+              {loadingBranches ? 'Loading…' : noBranches ? 'No branches yet' : 'Brand-wide (all branches)'}
+            </option>
+            {branches.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </Select>
+        </FormField>
       </form>
     </Dialog>
   );

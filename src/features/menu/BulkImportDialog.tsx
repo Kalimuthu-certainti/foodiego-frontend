@@ -8,6 +8,7 @@ import { Spinner } from '../../components/ui/spinner';
 import { FormField } from '../../components/FormField';
 import { useToast } from '../../components/ui/toast';
 import * as restaurantApi from '../../services/restaurantApi';
+import * as branchApi from '../../services/branchApi';
 import * as bulkUploadApi from '../../services/bulkUploadApi';
 import type { BulkUploadResult } from '../../services/bulkUploadApi';
 import { QUERY_KEYS } from '../../utils/constants';
@@ -20,24 +21,31 @@ export interface BulkImportDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-/** Bulk-import menu items from a CSV/Excel file into the bulk-upload module. */
 export function BulkImportDialog({ brandId, open, onOpenChange }: BulkImportDialogProps) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [restaurantId, setRestaurantId] = useState('');
+  const [branchId, setBranchId] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<BulkUploadResult | null>(null);
 
+  // Silently resolve the restaurant that belongs to this brand
   const { data: restaurants = [] } = useQuery({
     queryKey: QUERY_KEYS.restaurants(brandId),
     queryFn: () => restaurantApi.listByBrand(brandId),
     enabled: open,
   });
+  const firstRestaurantId = restaurants[0]?.id;
+
+  const { data: branches = [], isLoading: loadingBranches } = useQuery({
+    queryKey: QUERY_KEYS.branches(firstRestaurantId ?? ''),
+    queryFn: () => branchApi.listByRestaurant(firstRestaurantId as string),
+    enabled: Boolean(firstRestaurantId) && open,
+  });
 
   useEffect(() => {
     if (open) {
-      setRestaurantId('');
+      setBranchId('');
       setFile(null);
       setResult(null);
     }
@@ -45,23 +53,29 @@ export function BulkImportDialog({ brandId, open, onOpenChange }: BulkImportDial
 
   const mutation = useMutation({
     mutationFn: () => {
-      const restaurant = restaurants.find((r) => r.id === restaurantId);
+      const branch = branches.find((b) => b.id === branchId);
       return bulkUploadApi.upload({
-        restaurantId,
-        restaurantName: restaurant?.name ?? 'Restaurant',
+        restaurantId: branchId,
+        restaurantName: branch?.name ?? 'Branch',
         file: file as File,
       });
     },
     onSuccess: (res) => {
       setResult(res);
-      // Refresh the "Imported menu items" list (all + the chosen restaurant).
       queryClient.invalidateQueries({ queryKey: ['bulk-menu-items'] });
       toast.success(`Imported ${res.importedRows} item(s).`);
     },
     onError: (err) => toast.error(getErrorMessage(err, 'Upload failed.')),
   });
 
-  const canSubmit = Boolean(restaurantId) && Boolean(file) && !mutation.isPending;
+  const canSubmit = Boolean(branchId) && Boolean(file) && !mutation.isPending;
+
+  const noBranches = !loadingBranches && branches.length === 0;
+  const placeholderText = loadingBranches
+    ? 'Loading branches…'
+    : noBranches
+    ? 'No branches found — add one first'
+    : 'Select a branch';
 
   return (
     <Dialog
@@ -89,23 +103,23 @@ export function BulkImportDialog({ brandId, open, onOpenChange }: BulkImportDial
       ) : (
         <div className="flex flex-col gap-4">
           <FormField
-            label="Restaurant"
-            htmlFor="bulk-restaurant"
+            label="Branch"
+            htmlFor="bulk-branch"
             required
-            hint="Items are imported under this restaurant"
+            hint="Items will be tagged to this branch"
           >
             <Select
-              id="bulk-restaurant"
-              value={restaurantId}
-              onChange={(e) => setRestaurantId(e.target.value)}
-              disabled={restaurants.length === 0}
+              id="bulk-branch"
+              value={branchId}
+              onChange={(e) => setBranchId(e.target.value)}
+              disabled={noBranches || loadingBranches}
             >
               <option value="" disabled>
-                {restaurants.length === 0 ? 'No restaurants — add one first' : 'Select a restaurant'}
+                {placeholderText}
               </option>
-              {restaurants.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
+              {branches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
                 </option>
               ))}
             </Select>
@@ -133,7 +147,6 @@ export function BulkImportDialog({ brandId, open, onOpenChange }: BulkImportDial
   );
 }
 
-/** Post-import summary: counts + any per-row errors. */
 function ImportResult({ result }: { result: BulkUploadResult }) {
   return (
     <div className="flex flex-col gap-4">
