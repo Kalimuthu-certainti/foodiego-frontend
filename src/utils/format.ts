@@ -74,3 +74,22 @@ export function truncate(text: string, max = 40): string {
   if (text.length <= max) return text;
   return `${text.slice(0, max - 1)}…`;
 }
+
+/**
+ * Format a timestamp as relative time for recent dates ("2 mins ago", "1 hour ago")
+ * and as a full date for older ones ("24 Jun 2026, 2:30 PM").
+ */
+export function formatRelativeTime(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  const diffMs = Date.now() - d.getTime();
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min${mins > 1 ? 's' : ''} ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
+  return formatDateTime(iso);
+}

@@ -165,3 +165,77 @@ export interface ReportQuery {
   from?: string;
   to?: string;
 }
+
+// ── Orders ────────────────────────────────────────────────────────────────────
+
+export type OrderStatus =
+  | 'placed'
+  | 'confirmed'
+  | 'preparing'
+  | 'out_for_delivery'
+  | 'delivered'
+  | 'cancelled';
+
+export type OrderPaymentStatus = 'pending' | 'paid' | 'failed';
+
+export interface OrderItem {
+  name: string;
+  qty: number;
+  unit_price: number;
+  subtotal: number;
+}
+
+export interface Order {
+  id: string;
+  order_number: string;
+  brand_id: string;
+  branch_id: string | null;
+  branch_name: string | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+  customer_address: string | null;
+  items: OrderItem[];
+  total_amount: number;
+  platform_fee: number;
+  delivery_fee: number;
+  net_amount: number;
+  payment_method: string | null;
+  payment_status: OrderPaymentStatus;
+  status: OrderStatus;
+  cancel_reason: string | null;
+  cancelled_by: string | null;
+  placed_at: string;
+  confirmed_at: string | null;
+  preparing_at: string | null;
+  out_for_delivery_at: string | null;
+  delivered_at: string | null;
+  cancelled_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrderSummary {
+  placed_count: number;
+  confirmed_count: number;
+  preparing_count: number;
+  out_for_delivery_count: number;
+  delivered_count: number;
+  cancelled_count: number;
+}
+
+export interface OrderFilters {
+  branch_id?: string;
+  status?: OrderStatus | '';
+  from?: string;
+  to?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface OrdersResponse {
+  orders: Order[];
+  total: number;
+  page: number;
+  limit: number;
+}

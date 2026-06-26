@@ -3,6 +3,7 @@ import {
   BarChart3,
   LogOut,
   MapPin,
+  ShoppingBag,
   UtensilsCrossed,
   Users,
   ChefHat,
@@ -20,6 +21,7 @@ const NAV = [
   { to: '/branches', label: 'Branches', icon: MapPin },
   { to: '/staff',    label: 'Staff',    icon: Users },
   { to: '/menu',     label: 'Menu',     icon: ChefHat },
+  { to: '/orders',   label: 'Orders',   icon: ShoppingBag },
   { to: '/reports',  label: 'Reports',  icon: BarChart3 },
 ];
 

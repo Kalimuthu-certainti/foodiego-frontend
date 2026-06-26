@@ -4,6 +4,7 @@ import { AppLayout } from '../components/AppLayout';
 import LoginPage from '../pages/LoginPage';
 import BrandListPage from '../pages/BrandListPage';
 import BrandDetailPage from '../pages/BrandDetailPage';
+import OrderDetailPage from '../pages/OrderDetailPage';
 
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || undefined;
 
@@ -17,6 +18,7 @@ export const router = createBrowserRouter(
           element: <AppLayout />,
           children: [
             { index: true, element: <BrandListPage /> },
+            { path: 'orders/:orderId', element: <OrderDetailPage /> },
             { path: ':tab', element: <BrandDetailPage /> },
           ],
         },

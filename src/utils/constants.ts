@@ -7,6 +7,8 @@ import type {
   ChangeRequestStatus,
   PayoutStatus,
   DayKey,
+  OrderStatus,
+  OrderPaymentStatus,
 } from '../types';
 
 // ─── Roles ──────────────────────────────────────────────────────────────────
@@ -87,6 +89,34 @@ export const DAY_LABELS: Record<DayKey, string> = {
   sun: 'Sunday',
 };
 
+// ─── Order statuses ──────────────────────────────────────────────────────────
+
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  placed: 'Placed',
+  confirmed: 'Confirmed',
+  preparing: 'Preparing',
+  out_for_delivery: 'Out for Delivery',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+};
+
+export const ORDER_PAYMENT_STATUS_LABELS: Record<OrderPaymentStatus, string> = {
+  pending: 'Pending',
+  paid: 'Paid',
+  failed: 'Failed',
+};
+
+/** Statuses that a brand owner is allowed to cancel. */
+export const CANCELLABLE_STATUSES: OrderStatus[] = ['placed', 'confirmed'];
+
+export const CANCEL_REASONS = [
+  'Customer requested cancellation',
+  'Item out of stock',
+  'Branch closing early',
+  'Incorrect order details',
+  'Other',
+] as const;
+
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export const APP_NAME = 'FoodieGo';
@@ -107,4 +137,8 @@ export const QUERY_KEYS = {
     ['reports', brandId, from ?? null, to ?? null] as const,
   payouts: (brandId: string) => ['payouts', brandId] as const,
   bulkMenuItems: (restaurantId?: string) => ['bulk-menu-items', restaurantId ?? 'all'] as const,
+  orders: (brandId: string, filters: Record<string, unknown> = {}) =>
+    ['orders', brandId, filters] as const,
+  order: (id: string) => ['orders', 'detail', id] as const,
+  orderSummary: (brandId: string) => ['orders', 'summary', brandId] as const,
 };
