@@ -142,6 +142,13 @@ export interface CreateBranchInput {
   workingHours: WorkingHours;
 }
 
+export interface UpdateBranchInput {
+  name?: string;
+  lat?: number;
+  lng?: number;
+  workingHours?: WorkingHours;
+}
+
 export interface InviteStaffInput {
   name: string;
   role: Role;
@@ -235,6 +242,57 @@ export interface OrderFilters {
 
 export interface OrdersResponse {
   orders: Order[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// ── Reviews ───────────────────────────────────────────────────────────────────
+
+export type ReviewStatus = 'approved' | 'hidden' | 'flagged';
+
+export interface Review {
+  id: string;
+  order_id: string | null;
+  branch_id: string | null;
+  branch_name: string | null;
+  brand_id: string | null;
+  customer_name: string | null;
+  customer_phone: string | null;
+  rating: number;
+  review_text: string | null;
+  status: ReviewStatus;
+  owner_reply: string | null;
+  replied_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReviewSummary {
+  total_reviews: number;
+  avg_rating: number;
+  rating_breakdown: {
+    '5_star': number;
+    '4_star': number;
+    '3_star': number;
+    '2_star': number;
+    '1_star': number;
+  };
+}
+
+export interface ReviewFilters {
+  branch_id?: string;
+  rating?: number | '';
+  status?: ReviewStatus | '';
+  from?: string;
+  to?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface ReviewsResponse {
+  reviews: Review[];
   total: number;
   page: number;
   limit: number;
