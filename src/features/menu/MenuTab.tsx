@@ -61,23 +61,32 @@ export function MenuTab({ brand }: { brand: Brand }) {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900">Menu</h2>
+          <p className="mt-0.5 text-sm text-slate-500">Items, submissions, and change requests</p>
+        </div>
+      </div>
+
       <Card>
-        <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
-          <div className="flex items-center gap-3">
-            {locked ? (
-              <Lock className="h-5 w-5 text-slate-400" />
-            ) : (
-              <Pencil className="h-5 w-5 text-brand-600" />
-            )}
+        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
+          <div className="flex items-center gap-3.5">
+            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${locked ? 'bg-slate-100' : 'bg-brand-50'}`}>
+              {locked ? (
+                <Lock className="h-4.5 w-4.5 h-[18px] w-[18px] text-slate-400" />
+              ) : (
+                <Pencil className="h-[18px] w-[18px] text-brand-600" />
+              )}
+            </span>
             <div>
               <p className="text-sm font-semibold text-slate-900">
                 {locked ? 'Menu submitted' : 'Menu not submitted'}
               </p>
               <p className="text-sm text-slate-500">
                 {locked
-                  ? 'The menu is locked. Use change requests to propose edits.'
-                  : 'Submit your menu to make it live. This locks the menu.'}
+                  ? 'Locked — use change requests to propose edits.'
+                  : 'Submit your menu to make it live. This will lock the menu.'}
               </p>
             </div>
           </div>
@@ -102,7 +111,7 @@ export function MenuTab({ brand }: { brand: Brand }) {
       </Card>
 
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-slate-700">Change requests</h3>
+        <p className="mb-3 text-sm font-semibold text-slate-700">Change requests</p>
         <DataTable
           columns={columns}
           data={requests}

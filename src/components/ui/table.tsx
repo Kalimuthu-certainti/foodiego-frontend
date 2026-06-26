@@ -24,7 +24,7 @@ export const TableHeader = forwardRef<
   HTMLTableSectionElement,
   HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('border-b border-slate-200 bg-slate-50', className)} {...props} />
+  <thead ref={ref} className={cn('border-b border-slate-100 bg-slate-50/70', className)} {...props} />
 ));
 TableHeader.displayName = 'TableHeader';
 
@@ -38,7 +38,7 @@ TableBody.displayName = 'TableBody';
 
 export const TableRow = forwardRef<HTMLTableRowElement, HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
-    <tr ref={ref} className={cn('transition-colors hover:bg-slate-50', className)} {...props} />
+    <tr ref={ref} className={cn('transition-colors duration-100 hover:bg-slate-50/80', className)} {...props} />
   ),
 );
 TableRow.displayName = 'TableRow';

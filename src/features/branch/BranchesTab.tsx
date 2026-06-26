@@ -3,9 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { Select } from '../../components/ui/select';
-import { Spinner } from '../../components/ui/spinner';
-import { FormField } from '../../components/FormField';
 import { EmptyState } from '../../components/EmptyState';
 import { DataTable, type Column } from '../../components/DataTable';
 import { BranchFormDialog } from './BranchFormDialog';
@@ -15,7 +12,6 @@ import { QUERY_KEYS } from '../../utils/constants';
 import { formatCoords, formatWorkingHours } from '../../utils/format';
 import type { Branch } from '../../types';
 
-/** Brand-detail "Branches" tab: pick a restaurant, then list/add its branches. */
 export function BranchesTab({ brandId }: { brandId: string }) {
   const [restaurantId, setRestaurantId] = useState('');
   const [formOpen, setFormOpen] = useState(false);
@@ -25,7 +21,7 @@ export function BranchesTab({ brandId }: { brandId: string }) {
     queryFn: () => restaurantApi.listByBrand(brandId),
   });
 
-  // Default the selection to the first restaurant once they load.
+  // Auto-select the first (and typically only) restaurant silently — no picker shown.
   useEffect(() => {
     if (!restaurantId && restaurants.length > 0) setRestaurantId(restaurants[0].id);
   }, [restaurants, restaurantId]);
@@ -38,8 +34,17 @@ export function BranchesTab({ brandId }: { brandId: string }) {
 
   if (loadingRestaurants) {
     return (
-      <div className="flex justify-center py-12">
-        <Spinner />
+      <div className="flex flex-col gap-5">
+        <div className="h-14 animate-pulse rounded-xl bg-slate-100" />
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+          {Array.from({ length: 5 }, (_, i) => (
+            <div key={i} className="flex gap-4 border-b border-slate-100 px-4 py-3.5 last:border-0">
+              <div className="h-3.5 w-1/4 animate-pulse rounded-md bg-slate-100" />
+              <div className="h-3.5 w-1/3 animate-pulse rounded-md bg-slate-100" />
+              <div className="h-3.5 w-1/6 animate-pulse rounded-md bg-slate-100" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -47,8 +52,8 @@ export function BranchesTab({ brandId }: { brandId: string }) {
   if (restaurants.length === 0) {
     return (
       <EmptyState
-        title="No restaurants yet"
-        description="Add a restaurant in the Restaurants tab before configuring branches."
+        title="No outlet configured yet"
+        description="Your restaurant outlet will be set up by an administrator."
       />
     );
   }
@@ -83,16 +88,12 @@ export function BranchesTab({ brandId }: { brandId: string }) {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <FormField label="Restaurant" htmlFor="branch-restaurant" className="w-full max-w-xs">
-          <Select
-            id="branch-restaurant"
-            value={restaurantId}
-            onChange={(e) => setRestaurantId(e.target.value)}
-            options={restaurants.map((r) => ({ value: r.id, label: r.name }))}
-          />
-        </FormField>
+    <div className="flex flex-col gap-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900">Branches</h2>
+          <p className="mt-0.5 text-sm text-slate-500">Locations and opening hours for each outlet</p>
+        </div>
         <Button onClick={() => setFormOpen(true)} disabled={!restaurantId}>
           <Plus className="h-4 w-4" />
           Add branch
@@ -114,13 +115,13 @@ export function BranchesTab({ brandId }: { brandId: string }) {
         }
       />
 
-      {restaurantId ? (
+      {restaurantId && (
         <BranchFormDialog
           restaurantId={restaurantId}
           open={formOpen}
           onOpenChange={setFormOpen}
         />
-      ) : null}
+      )}
     </div>
   );
 }

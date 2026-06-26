@@ -182,6 +182,14 @@ export function ReportsTab({ brandId }: { brandId: string }) {
   return (
     <div className="flex flex-col gap-6">
 
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900">Reports</h2>
+          <p className="mt-0.5 text-sm text-slate-500">Revenue, orders, and payout history</p>
+        </div>
+      </div>
+
       {/* ── Date range bar ── */}
       <div className="flex flex-wrap items-center gap-2">
         {(['7d', '30d', '90d'] as Preset[]).map((p) => (

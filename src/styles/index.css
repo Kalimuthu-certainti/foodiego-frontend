@@ -2,11 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Entrance animations ── */
+@keyframes dialog-in {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-dialog-in {
+  animation: dialog-in 0.18s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
+}
+.animate-toast-in {
+  animation: toast-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-fade-up {
+  animation: fade-up 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Login page background ── */
+.bg-dot-grid {
+  background-image: radial-gradient(circle, #d1d5db 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
 @layer base {
   html,
   body,
   #root {
     height: 100%;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
@@ -26,5 +60,28 @@
 
   *:focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    background: #FBE2D6;
+    color: #6E2B1A;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #d6d3d1;
+    border-radius: 99px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a8a29e;
   }
 }

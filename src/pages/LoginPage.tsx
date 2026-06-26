@@ -54,25 +54,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4">
-      {/* Soft brand glow — the one decorative flourish, kept faint. */}
+    <div className="bg-dot-grid relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4">
+      {/* Warm brand glow behind the card */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 left-1/2 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-brand-200/40 blur-3xl"
+        className="pointer-events-none absolute -top-24 left-1/2 h-[26rem] w-[26rem] -translate-x-1/2 rounded-full bg-brand-300/20 blur-3xl"
       />
-      <div className="relative w-full max-w-md">
-        <div className="mb-6 flex flex-col items-center text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-soft">
-            <UtensilsCrossed className="h-6 w-6" />
+      <div className="relative w-full max-w-sm">
+        <div className="mb-7 flex flex-col items-center text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-pop">
+            <UtensilsCrossed className="h-7 w-7" />
           </span>
           <span className="mt-3 font-display text-2xl font-semibold tracking-tight text-slate-900">
             {APP_NAME}
           </span>
+          <span className="mt-1 text-sm text-slate-500">Brand Admin Portal</span>
         </div>
-        <Card className="w-full shadow-soft">
-          <CardHeader>
-            <CardTitle>Welcome back</CardTitle>
-            <CardDescription>Sign in to manage your brand, restaurants, and payouts.</CardDescription>
+        <Card className="w-full shadow-pop">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Sign in to your account</CardTitle>
+            <CardDescription>Enter your credentials to continue.</CardDescription>
           </CardHeader>
           <CardContent>
           <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>

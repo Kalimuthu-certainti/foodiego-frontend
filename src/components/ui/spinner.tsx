@@ -9,7 +9,7 @@ export interface SpinnerProps {
 export function Spinner({ className, label = 'Loading' }: SpinnerProps) {
   return (
     <span role="status" aria-label={label} className="inline-flex items-center">
-      <Loader2 className={cn('h-5 w-5 animate-spin text-slate-400', className)} />
+      <Loader2 className={cn('h-5 w-5 animate-spin text-brand-500', className)} />
       <span className="sr-only">{label}</span>
     </span>
   );

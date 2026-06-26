@@ -24,17 +24,11 @@ export default function BrandListPage() {
   useEffect(() => {
     if (brands.length === 1) {
       selectBrand(brands[0].id);
-      navigate('/restaurants', { replace: true });
+      navigate('/branches', { replace: true });
     }
   }, [brands, selectBrand, navigate]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <Spinner />
-      </div>
-    );
-  }
+  if (isLoading) return <div className="flex justify-center py-16"><Spinner /></div>;
 
   if (brands.length === 0) {
     return (
@@ -52,18 +46,18 @@ export default function BrandListPage() {
     { key: 'created_at', header: 'Created', cell: (b) => <span className="text-slate-500">{formatDate(b.created_at)}</span> },
   ];
 
-  const handleSelect = (b: Brand) => {
-    selectBrand(b.id);
-    navigate('/restaurants');
-  };
-
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold text-slate-900">Your Brands</h1>
         <p className="text-sm text-slate-500">Select a brand to manage.</p>
       </div>
-      <DataTable columns={columns} data={brands} rowKey={(b) => b.id} onRowClick={handleSelect} />
+      <DataTable
+        columns={columns}
+        data={brands}
+        rowKey={(b) => b.id}
+        onRowClick={(b) => { selectBrand(b.id); navigate('/branches'); }}
+      />
     </div>
   );
 }

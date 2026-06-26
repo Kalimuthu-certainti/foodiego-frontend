@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Badge, type BadgeVariant } from '../../components/ui/badge';
-import { Select } from '../../components/ui/select';
+import { Button } from '../../components/ui/button';
 import { DataTable, type Column } from '../../components/DataTable';
-import { EmptyState } from '../../components/EmptyState';
-import * as restaurantApi from '../../services/restaurantApi';
 import * as bulkUploadApi from '../../services/bulkUploadApi';
 import type { BulkMenuItem } from '../../services/bulkUploadApi';
 import { QUERY_KEYS } from '../../utils/constants';
 import { formatCurrency } from '../../utils/format';
+
+const PAGE_SIZE = 15;
 
 const FOOD_TYPE_VARIANTS: Record<string, BadgeVariant> = {
   Veg: 'success',
@@ -16,31 +17,20 @@ const FOOD_TYPE_VARIANTS: Record<string, BadgeVariant> = {
   Egg: 'warning',
 };
 
-/**
- * Lists menu items imported via Bulk import, ALWAYS scoped to a restaurant. With
- * no restaurants there's nothing to show (items only make sense under a
- * restaurant), so we render an empty state instead of every persisted row.
- */
-export function ImportedMenuItems({ brandId }: { brandId: string }) {
-  const [restaurantId, setRestaurantId] = useState('');
-
-  const { data: restaurants = [] } = useQuery({
-    queryKey: QUERY_KEYS.restaurants(brandId),
-    queryFn: () => restaurantApi.listByBrand(brandId),
-  });
-
-  // Default to the first restaurant once they load.
-  useEffect(() => {
-    if (!restaurantId && restaurants.length > 0) setRestaurantId(restaurants[0].id);
-  }, [restaurants, restaurantId]);
+export function ImportedMenuItems({ brandId: _brandId }: { brandId: string }) {
+  const [page, setPage] = useState(1);
 
   const { data, isLoading } = useQuery({
-    queryKey: QUERY_KEYS.bulkMenuItems(restaurantId),
-    queryFn: () => bulkUploadApi.listMenuItems(restaurantId),
-    enabled: Boolean(restaurantId), // never fetch the unscoped "all items" list
+    queryKey: QUERY_KEYS.bulkMenuItems(undefined),
+    queryFn: () => bulkUploadApi.listMenuItems(),
   });
 
   const items = data?.items ?? [];
+  const totalItems = data?.totalItems ?? 0;
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  const pageItems = items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const rangeStart = items.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(page * PAGE_SIZE, items.length);
 
   const columns: Column<BulkMenuItem>[] = [
     {
@@ -79,41 +69,53 @@ export function ImportedMenuItems({ brandId }: { brandId: string }) {
     },
   ];
 
-  // No restaurant exists → don't show any imported items.
-  if (restaurants.length === 0) {
-    return (
-      <div>
-        <h3 className="mb-2 text-sm font-semibold text-slate-700">Imported menu items</h3>
-        <EmptyState
-          title="No restaurants yet"
-          description="Add a restaurant first — then bulk-import its menu and the items appear here."
-        />
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-slate-700">
-          Imported menu items{data ? ` (${data.totalItems})` : ''}
-        </h3>
-        <Select
-          aria-label="Restaurant"
-          className="h-9 w-56"
-          value={restaurantId}
-          onChange={(e) => setRestaurantId(e.target.value)}
-          options={restaurants.map((r) => ({ value: r.id, label: r.name }))}
-        />
-      </div>
+    <div className="flex flex-col gap-3">
+      <p className="text-sm font-semibold text-slate-700">
+        Imported menu items{totalItems > 0 ? ` (${totalItems})` : ''}
+      </p>
+
       <DataTable
         columns={columns}
-        data={items}
+        data={pageItems}
         rowKey={(i) => String(i.id)}
         isLoading={isLoading}
-        emptyTitle="No imported items for this restaurant"
-        emptyDescription="Use Bulk import above to upload a CSV/Excel menu file for this restaurant."
+        emptyTitle="No imported items yet"
+        emptyDescription="Use Bulk import above to upload a CSV/Excel menu file."
       />
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between gap-4 border-t border-slate-100 pt-3 text-sm">
+          <span className="text-slate-500">
+            {rangeStart}–{rangeEnd} of {items.length} items
+          </span>
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p - 1)}
+              disabled={page === 1}
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <span className="min-w-[4rem] text-center tabular-nums text-slate-600">
+              {page} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page === totalPages}
+              aria-label="Next page"
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

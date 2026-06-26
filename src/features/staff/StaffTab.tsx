@@ -104,8 +104,12 @@ export function StaffTab({ brandId }: { brandId: string }) {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-end">
+    <div className="flex flex-col gap-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900">Staff</h2>
+          <p className="mt-0.5 text-sm text-slate-500">Team members and their access levels</p>
+        </div>
         <Button onClick={() => setInviteOpen(true)}>
           <Plus className="h-4 w-4" />
           Invite staff
