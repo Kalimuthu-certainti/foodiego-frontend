@@ -10,6 +10,7 @@ import { BrandStatusBadge } from '../features/brand/BrandStatusBadge';
 import { BranchesTab } from '../features/branch/BranchesTab';
 import { StaffTab } from '../features/staff/StaffTab';
 import { MenuTab } from '../features/menu/MenuTab';
+import { OrdersTab } from '../features/orders/OrdersTab';
 import { ReportsTab } from '../features/reports/ReportsTab';
 import * as brandApi from '../services/brandApi';
 import * as restaurantApi from '../services/restaurantApi';
@@ -122,6 +123,7 @@ export default function BrandDetailPage() {
       {tab === 'branches' && <BranchesTab brandId={brand.id} />}
       {tab === 'staff'    && <StaffTab brandId={brand.id} />}
       {tab === 'menu'     && <MenuTab brand={brand} />}
+      {tab === 'orders'   && <OrdersTab brandId={brand.id} />}
       {tab === 'reports'  && <ReportsTab brandId={brand.id} />}
     </div>
   );
