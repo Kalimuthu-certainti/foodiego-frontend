@@ -9,6 +9,7 @@ import type {
   DayKey,
   OrderStatus,
   OrderPaymentStatus,
+  ReviewStatus,
 } from '../types';
 
 // ─── Roles ──────────────────────────────────────────────────────────────────
@@ -109,6 +110,14 @@ export const ORDER_PAYMENT_STATUS_LABELS: Record<OrderPaymentStatus, string> = {
 /** Statuses that a brand owner is allowed to cancel. */
 export const CANCELLABLE_STATUSES: OrderStatus[] = ['placed', 'confirmed'];
 
+// ─── Review statuses ─────────────────────────────────────────────────────────
+
+export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {
+  approved: 'Approved',
+  hidden: 'Hidden',
+  flagged: 'Flagged',
+};
+
 export const CANCEL_REASONS = [
   'Customer requested cancellation',
   'Item out of stock',
@@ -141,4 +150,7 @@ export const QUERY_KEYS = {
     ['orders', brandId, filters] as const,
   order: (id: string) => ['orders', 'detail', id] as const,
   orderSummary: (brandId: string) => ['orders', 'summary', brandId] as const,
+  reviews: (brandId: string, filters: Record<string, unknown> = {}) =>
+    ['reviews', brandId, filters] as const,
+  reviewSummary: (brandId: string) => ['reviews', 'summary', brandId] as const,
 };

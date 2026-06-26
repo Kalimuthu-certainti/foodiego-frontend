@@ -12,6 +12,7 @@ import { StaffTab } from '../features/staff/StaffTab';
 import { MenuTab } from '../features/menu/MenuTab';
 import { OrdersTab } from '../features/orders/OrdersTab';
 import { ReportsTab } from '../features/reports/ReportsTab';
+import { ReviewsTab } from '../features/reviews/ReviewsTab';
 import * as brandApi from '../services/brandApi';
 import * as restaurantApi from '../services/restaurantApi';
 import * as branchApi from '../services/branchApi';
@@ -124,6 +125,7 @@ export default function BrandDetailPage() {
       {tab === 'staff'    && <StaffTab brandId={brand.id} />}
       {tab === 'menu'     && <MenuTab brand={brand} />}
       {tab === 'orders'   && <OrdersTab brandId={brand.id} />}
+      {tab === 'reviews'  && <ReviewsTab brandId={brand.id} />}
       {tab === 'reports'  && <ReportsTab brandId={brand.id} />}
     </div>
   );

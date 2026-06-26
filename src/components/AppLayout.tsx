@@ -4,6 +4,7 @@ import {
   LogOut,
   MapPin,
   ShoppingBag,
+  Star,
   UtensilsCrossed,
   Users,
   ChefHat,
@@ -22,6 +23,7 @@ const NAV = [
   { to: '/staff',    label: 'Staff',    icon: Users },
   { to: '/menu',     label: 'Menu',     icon: ChefHat },
   { to: '/orders',   label: 'Orders',   icon: ShoppingBag },
+  { to: '/reviews',  label: 'Reviews',  icon: Star },
   { to: '/reports',  label: 'Reports',  icon: BarChart3 },
 ];
 
