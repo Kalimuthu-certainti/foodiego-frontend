@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { EmptyState } from '../../components/EmptyState';
@@ -15,6 +15,7 @@ import type { Branch } from '../../types';
 export function BranchesTab({ brandId }: { brandId: string }) {
   const [restaurantId, setRestaurantId] = useState('');
   const [formOpen, setFormOpen] = useState(false);
+  const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
 
   const { data: restaurants = [], isLoading: loadingRestaurants } = useQuery({
     queryKey: QUERY_KEYS.restaurants(brandId),
@@ -85,6 +86,20 @@ export function BranchesTab({ brandId }: { brandId: string }) {
         </span>
       ),
     },
+    {
+      key: 'actions',
+      header: '',
+      cell: (b) => (
+        <button
+          onClick={() => { setEditingBranch(b); setFormOpen(true); }}
+          className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+          aria-label={`Edit ${b.name}`}
+        >
+          <Pencil className="h-3.5 w-3.5" />
+          Edit
+        </button>
+      ),
+    },
   ];
 
   return (
@@ -118,8 +133,12 @@ export function BranchesTab({ brandId }: { brandId: string }) {
       {restaurantId && (
         <BranchFormDialog
           restaurantId={restaurantId}
+          branch={editingBranch ?? undefined}
           open={formOpen}
-          onOpenChange={setFormOpen}
+          onOpenChange={(open) => {
+            setFormOpen(open);
+            if (!open) setEditingBranch(null);
+          }}
         />
       )}
     </div>
