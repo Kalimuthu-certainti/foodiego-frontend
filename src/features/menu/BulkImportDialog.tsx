@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle2, FileUp, Upload } from 'lucide-react';
+import { CheckCircle2, Clock, FileUp, Upload } from 'lucide-react';
 import { Dialog } from '../../components/ui/dialog';
 import { Button } from '../../components/ui/button';
 import { Select } from '../../components/ui/select';
@@ -160,6 +160,14 @@ function ImportResult({ result }: { result: BulkUploadResult }) {
         <Stat label="Imported" value={result.importedRows} tone="success" />
         <Stat label="Skipped" value={result.skippedRows} />
         <Stat label="Failed" value={result.invalidRows + result.failedRecordCount} tone="danger" />
+      </div>
+
+      <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+        <Clock className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+        <p>
+          Imported items are <strong>pending platform admin approval</strong> and will not appear
+          in diner login until approved.
+        </p>
       </div>
 
       {result.errors.length > 0 ? (

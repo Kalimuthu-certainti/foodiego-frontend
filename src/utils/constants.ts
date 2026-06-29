@@ -145,7 +145,7 @@ export const QUERY_KEYS = {
   reports: (brandId: string, from?: string, to?: string) =>
     ['reports', brandId, from ?? null, to ?? null] as const,
   payouts: (brandId: string) => ['payouts', brandId] as const,
-  bulkMenuItems: (restaurantId?: string) => ['bulk-menu-items', restaurantId ?? 'all'] as const,
+  bulkMenuItems: (restaurantId?: string, status?: string) => ['bulk-menu-items', restaurantId ?? 'all', status ?? ''] as const,
   orders: (brandId: string, filters: Record<string, unknown> = {}) =>
     ['orders', brandId, filters] as const,
   order: (id: string) => ['orders', 'detail', id] as const,

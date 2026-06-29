@@ -70,10 +70,11 @@ export interface MenuItemsResponse {
   filteredCount: number;
 }
 
-/** GET /bulk-upload/menu-items — items imported via bulk upload (optionally by restaurant). */
-export async function listMenuItems(restaurantId?: string): Promise<MenuItemsResponse> {
-  const { data } = await http.get<ApiEnvelope<MenuItemsResponse>>('/bulk-upload/menu-items', {
-    params: restaurantId ? { restaurant_id: restaurantId } : {},
-  });
+/** GET /bulk-upload/menu-items — items imported via bulk upload, optionally filtered by restaurant/status. */
+export async function listMenuItems(restaurantId?: string, status?: string): Promise<MenuItemsResponse> {
+  const params: Record<string, string> = {};
+  if (restaurantId) params.restaurant_id = restaurantId;
+  if (status) params.status = status;
+  const { data } = await http.get<ApiEnvelope<MenuItemsResponse>>('/bulk-upload/menu-items', { params });
   return data.data;
 }

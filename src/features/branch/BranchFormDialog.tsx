@@ -10,11 +10,12 @@ import { Spinner } from '../../components/ui/spinner';
 import { FormField } from '../../components/FormField';
 import { useToast } from '../../components/ui/toast';
 import { WorkingHoursEditor, emptyWorkingHours } from './WorkingHoursEditor';
-import { branchSchema, type BranchFormValues } from '../../validators/branch';
+import { branchSchema, type BranchFormValues, type WorkingHoursValues } from '../../validators/branch';
 import * as branchApi from '../../services/branchApi';
-import { QUERY_KEYS } from '../../utils/constants';
+import { DAY_KEYS, QUERY_KEYS } from '../../utils/constants';
 import { getErrorMessage } from '../../utils/apiError';
 import { cn } from '../../utils/cn';
+import type { Branch } from '../../types';
 
 interface NominatimResult {
   place_id: number;
@@ -38,11 +39,20 @@ async function nominatimSearch(query: string): Promise<NominatimResult[]> {
 
 export interface BranchFormDialogProps {
   restaurantId: string;
+  branch?: Branch;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function BranchFormDialog({ restaurantId, open, onOpenChange }: BranchFormDialogProps) {
+function toFormHours(wh: Branch['working_hours']): WorkingHoursValues {
+  return DAY_KEYS.reduce(
+    (acc, day) => ({ ...acc, [day]: wh[day] ?? [] }),
+    {} as WorkingHoursValues,
+  );
+}
+
+export function BranchFormDialog({ restaurantId, branch, open, onOpenChange }: BranchFormDialogProps) {
+  const isEdit = Boolean(branch);
   const queryClient = useQueryClient();
   const toast = useToast();
 
@@ -85,11 +95,16 @@ export function BranchFormDialog({ restaurantId, open, onOpenChange }: BranchFor
   // Reset all state when dialog opens
   useEffect(() => {
     if (open) {
-      reset({ name: '', workingHours: emptyWorkingHours() });
+      if (branch) {
+        reset({ name: branch.name, lat: branch.lat, lng: branch.lng, workingHours: toFormHours(branch.working_hours) });
+        setSelectedLabel(`${branch.lat.toFixed(4)}, ${branch.lng.toFixed(4)}`);
+      } else {
+        reset({ name: '', workingHours: emptyWorkingHours() });
+        setSelectedLabel('');
+      }
       setQuery('');
       setResults([]);
       setShowDropdown(false);
-      setSelectedLabel('');
       setLocationError('');
       setManualOpen(false);
       setBuilding('');
@@ -97,7 +112,7 @@ export function BranchFormDialog({ restaurantId, open, onOpenChange }: BranchFor
       setArea('');
       setPincode('');
     }
-  }, [open, reset]);
+  }, [open, reset, branch]);
 
   // Debounced search as user types
   useEffect(() => {
@@ -166,10 +181,13 @@ export function BranchFormDialog({ restaurantId, open, onOpenChange }: BranchFor
   };
 
   const mutation = useMutation({
-    mutationFn: (values: BranchFormValues) => branchApi.create({ restaurantId, ...values }),
+    mutationFn: (values: BranchFormValues) =>
+      isEdit && branch
+        ? branchApi.update(branch.id, values)
+        : branchApi.create({ restaurantId, ...values }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.branches(restaurantId) });
-      toast.success('Branch added.');
+      toast.success(isEdit ? 'Branch updated.' : 'Branch added.');
       onOpenChange(false);
     },
     onError: (err) => toast.error(getErrorMessage(err)),
@@ -181,8 +199,8 @@ export function BranchFormDialog({ restaurantId, open, onOpenChange }: BranchFor
     <Dialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Add branch"
-      description="Search for the branch address and set its weekly opening hours."
+      title={isEdit ? 'Edit branch' : 'Add branch'}
+      description={isEdit ? 'Update the name, location, or working hours for this branch.' : 'Search for the branch address and set its weekly opening hours.'}
       className="max-w-xl"
       footer={
         <>
@@ -191,7 +209,7 @@ export function BranchFormDialog({ restaurantId, open, onOpenChange }: BranchFor
           </Button>
           <Button form="branch-form" type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? <Spinner className="h-4 w-4" /> : null}
-            Add branch
+            {isEdit ? 'Save changes' : 'Add branch'}
           </Button>
         </>
       }
